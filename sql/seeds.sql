@@ -20,8 +20,8 @@ VALUES ('salesperson', 40000, 1),
        ('team lead', 40000, 6),
        ('assistant manager', 50000, 6);
 
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ('Stacy', 'Smith', 1, 2),
-       ('George', 'Cavalier', 2, 2);
+-- INSERT INTO employees (first_name, last_name, role_id, manager_id)
+-- VALUES ('Stacy', 'Smith', 1, 2),
+--        ('George', 'Cavalier', 2, 2);
 
 
