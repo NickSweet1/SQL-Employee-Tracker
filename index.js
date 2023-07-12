@@ -1,14 +1,69 @@
 const fs = require("fs");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
-const sqlPassword = require("./password");
+// const sqlPassword = require("./password");
+require('dotenv').config();
 
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: sqlPassword,
+  password: process.env.SQL_PASS,
   database: "employees",
 });
+
+// const departmentChoices = () => {
+//   db.query(`SELECT name FROM departments`, (err, results) => {
+//     console.log(results);
+//   })
+// }
+
+const addADepartment = () => {
+  inquirer.prompt([{
+    name: "addDepartment",
+    message: "Please enter the name of the department you would like to add?",
+  }]).then((res) => {
+    let name = res;
+    db.query(`INSERT INTO departments (name) VALUES ('${name.addDepartment}')`, (err, res) => {
+      console.log('Added to database.');
+    });
+    init();
+  }) 
+}
+
+const addARole = () => {
+  db.query(`SELECT id, name FROM departments`, (err, res) => {
+    // console.log(res);
+    const departmentChoices = res.map((department) => ({
+      name: department.name,
+      value: department.id
+    }));
+
+    inquirer.prompt([{
+      name: "title",
+      message: "What is the name of the role?"
+    },
+    {
+      name: 'salary',
+      message: 'What is your salary?'
+    },
+    {
+      name: 'departmentId',
+      message: 'Which department does the role belong to?',
+      type: 'list',
+      choices: departmentChoices
+    }
+  ]).then(row => {
+    db.query(`INSERT INTO roles (title, salary, department_id) VALUES ('${row.title}', '${row.salary}', '${row.departmentId}')`, (err, res) => {
+      console.log('Role added.');
+      init();
+    })
+  })
+  })
+}
+
+const addEmployee = () => {
+
+}
 
 const inquirerPrompt = [
   {
@@ -26,31 +81,32 @@ const inquirerPrompt = [
       "Quit",
     ]
   },
-  {
-    name: "addDepartment",
-    message: "Please enter the name of the department you would like to add?",
-    when: (answers) => answers.start === "Add a Department"
-  },
-  {
-    name: "addRole",
-    message: "Please enter the name of the role you would like to add.",
-    when: (answers) => answers.start === "Add a Role"
-  },
-  {
-    name: "addRoleSalary",
-    message: "Please enter a salary for this role.",
-    when: (answers) => answers.addRole
-  },
-  {
-    name: "addRoleDepartment",
-    message: "Please provide a department for this role.",
-    when: (answers) => answers.addRoleSalary
-  },
-  {
-    name: "addEmployee",
-    message: "Please enter the employee's first name, last name, role, and manager.",
-    when: (answers) => answers.start === "Add an Employee"
-  },
+  // {
+  //   name: "addDepartment",
+  //   message: "Please enter the name of the department you would like to add?",
+  //   when: (answers) => answers.start === "Add a Department"
+  // },
+  // {
+  //   name: "addRole",
+  //   message: "Please enter the name of the role you would like to add.",
+  //   when: (answers) => answers.start === "Add a Role"
+  // },
+  // {
+  //   name: "addRoleSalary",
+  //   message: "Please enter a salary for this role.",
+  //   when: (answers) => answers.addRole
+  // },
+  // {
+  //   name: "addRoleDepartment",
+  //   type: "list",
+  //   choices: departmentChoices,
+  //   when: (answers) => answers.addRoleSalary
+  // },
+  // {
+  //   name: "addEmployee",
+  //   message: "Please enter the employee's first name, last name, role, and manager.",
+  //   when: (answers) => answers.start === "Add an Employee"
+  // },
 ];
 
 init = () => {
@@ -63,6 +119,7 @@ init = () => {
           }
           console.table(result);
         });
+        init();
         break;
       case "View All Roles":
         db.query(
@@ -82,18 +139,16 @@ init = () => {
           }
           console.table(result);
         });
+        init();
         break;
       case "Add a Department":
-          db.query(`INSERT INTO departments (name) VALUES ('${answers.addDepartment}')`);
-          console.log(`The department "${answers.addDepartment}" has been added.`);
+        addADepartment();
         break;
       case "Add a Role":
-
-        console.log(`New role successfully added.`);
-        db.query(`INSERT INTO roles (title, salary, department_id) VALUES ('${answers.addRole}', '${answers.addRoleSalary}', '${answers.addRoleDepartment}')`)
+        addARole();
         break;
       case "Add an Employee":
-        //insert logic
+        addEmployee();
         break;
       case "Update an Employee Role":
         //insert logic
