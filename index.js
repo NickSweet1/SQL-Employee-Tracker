@@ -150,32 +150,6 @@ const inquirerPrompt = [
       "Quit",
     ],
   },
-  // {
-  //   name: "addDepartment",
-  //   message: "Please enter the name of the department you would like to add?",
-  //   when: (answers) => answers.start === "Add a Department"
-  // },
-  // {
-  //   name: "addRole",
-  //   message: "Please enter the name of the role you would like to add.",
-  //   when: (answers) => answers.start === "Add a Role"
-  // },
-  // {
-  //   name: "addRoleSalary",
-  //   message: "Please enter a salary for this role.",
-  //   when: (answers) => answers.addRole
-  // },
-  // {
-  //   name: "addRoleDepartment",
-  //   type: "list",
-  //   choices: departmentChoices,
-  //   when: (answers) => answers.addRoleSalary
-  // },
-  // {
-  //   name: "addEmployee",
-  //   message: "Please enter the employee's first name, last name, role, and manager.",
-  //   when: (answers) => answers.start === "Add an Employee"
-  // },
 ];
 
 init = () => {
