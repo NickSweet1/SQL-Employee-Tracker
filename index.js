@@ -28,13 +28,11 @@ const addADepartment = () => {
           console.log("Added to database.");
         }
       );
-      init();
     });
 };
 
 const addARole = () => {
   db.query(`SELECT id, name FROM departments`, (err, res) => {
-    // console.log(res);
     const departmentChoices = res.map((department) => ({
       name: department.name,
       value: department.id,
@@ -62,7 +60,6 @@ const addARole = () => {
           `INSERT INTO roles (title, salary, department_id) VALUES ('${row.title}', '${row.salary}', '${row.departmentId}')`,
           (err, res) => {
             console.log("Role added.");
-            init();
           }
         );
       });
@@ -71,8 +68,7 @@ const addARole = () => {
 
 const addEmployee = () => {
   //pull list of managers and sets id still needs debugging
-  db.query(`SELECT id, manager_id, first_name FROM employees`, (err, res) => {
-    console.log(res);
+  db.query(`SELECT id, manager_id, first_name FROM employees WHERE manager_id IS NULL`, (err, res) => {
     const employeeManagers = res.map((managers) => ({
       name: managers.first_name,
       value: managers.id,
@@ -80,52 +76,82 @@ const addEmployee = () => {
 
     //pull list of roles and sets the id
     db.query(`SELECT id, title FROM roles`, (err, res) => {
-      // console.log(res);
       const roleChoices = res.map((role) => ({
         name: role.title,
-        value: role.id
+        value: role.id,
       }));
 
-    inquirer
-      .prompt([
-        {
-          name: "firstName",
-          message:
-            "What is the first name of the employee you would like to add?",
-        },
-        {
-          name: "lastName",
-          message:
-            "What is the last name of the employee you would like to add?",
-        },
-        {
-          name: "role",
-          message: "What role is the employee going to have?",
-          type: "list",
-          choices: roleChoices,
-        },
-        {
-          name: "manager",
-          tylpe: "list",
-          message: "Who will be the manager of this employee?",
-          choices: employeeManagers,
-        },
-      ])
-      .then((row) => {
-        db.query(
-          `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('${row.firstName}', '${row.lastName}', '${row.role}', '${row.manager}')`,
-          (err, res) => {
-            if (err) {
-              console.log(err);
+      inquirer
+        .prompt([
+          {
+            name: "firstName",
+            message:
+              "What is the first name of the employee you would like to add?",
+          },
+          {
+            name: "lastName",
+            message:
+              "What is the last name of the employee you would like to add?",
+          },
+          {
+            name: "role",
+            message: "What role is the employee going to have?",
+            type: "list",
+            choices: roleChoices,
+          },
+          {
+            name: "manager",
+            type: "list",
+            message: "Who will be the manager of this employee?",
+            choices: employeeManagers,
+          },
+        ])
+        .then((row) => {
+          db.query(
+            `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('${row.firstName}', '${row.lastName}', '${row.role}', '${row.manager}')`,
+            (err, res) => {
+              if (err) {
+                console.log(err);
+              }
+              console.log("Employee added.");
+              console.log(employeeManagers);
             }
-            console.log("Employee added.");
-            console.log(employeeManagers);
-            init();
-          }
-        );
-      });
+          );
+        });
+    });
   });
-});
+};
+
+const updateEmployee = () => {
+
+    db.query(`SELECT employees.first_name, employees.last_name, employees.role_id, roles.title FROM employees INNER JOIN roles ON employees.role_id = roles.id`, (err, res) => {
+      const employeeList = res.map((employee) => ({
+        name: `${employee.first_name} ${employee.last_name}`,
+        value: employee.role_id,
+      }))
+      console.log(employeeList)
+
+      const roleList = res.map((employee) => ({
+        name: employee.title,
+        value: employee.role_id,
+      }))
+      console.log(roleList);
+      
+    inquirer.prompt ([
+      {
+        name: "updateEmployee",
+        message: "Please select which employee you would like to update.",
+        type: "list",
+        choices: employeeList,
+      },
+      {
+        name: "newRole",
+        message: "Please select the new role for the employee.",
+        type: "list",
+        choices: roleList, // Add the choices for the new role
+      },
+      ])
+    })
 };
 
 const inquirerPrompt = [
@@ -156,7 +182,6 @@ init = () => {
           }
           console.table(result);
         });
-        init();
         break;
       case "View All Roles":
         db.query(
@@ -179,7 +204,6 @@ init = () => {
             console.table(result);
           }
         );
-        init();
         break;
       case "Add a Department":
         addADepartment();
@@ -191,7 +215,7 @@ init = () => {
         addEmployee();
         break;
       case "Update an Employee Role":
-        //insert logic
+        updateEmployee();
         break;
       case "Quit":
         db.end(); //Close the mysql connection
@@ -199,5 +223,6 @@ init = () => {
     }
   });
 };
+
 
 init();
