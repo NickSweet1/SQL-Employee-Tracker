@@ -11,12 +11,6 @@ const db = mysql.createConnection({
   database: "employees",
 });
 
-// const departmentChoices = () => {
-//   db.query(`SELECT name FROM departments`, (err, results) => {
-//     console.log(results);
-//   })
-// }
-
 const addADepartment = () => {
   inquirer
     .prompt([
