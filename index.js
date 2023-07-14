@@ -28,7 +28,7 @@ const addADepartment = () => {
           console.log("Added to database.");
         }
       );
-    });
+    }).then(() => init())
 };
 
 const addARole = () => {
@@ -46,7 +46,7 @@ const addARole = () => {
         },
         {
           name: "salary",
-          message: "What is your salary?",
+          message: "What is the salary for the role?",
         },
         {
           name: "departmentId",
@@ -60,6 +60,7 @@ const addARole = () => {
           `INSERT INTO roles (title, salary, department_id) VALUES ('${row.title}', '${row.salary}', '${row.departmentId}')`,
           (err, res) => {
             console.log("Role added.");
+            init();
           }
         );
       });
@@ -114,7 +115,7 @@ const addEmployee = () => {
                 console.log(err);
               }
               console.log("Employee added.");
-              console.log(employeeManagers);
+              init();
             }
           );
         });
@@ -122,37 +123,35 @@ const addEmployee = () => {
   });
 };
 
-const updateEmployee = () => {
+const updateEmployee = async() => {
+    const [employees] = await db.promise().query(`SELECT * FROM employees`)
+    const [roles] = await db.promise().query(`SELECT * FROM roles`)
 
-    db.query(`SELECT employees.first_name, employees.last_name, employees.role_id, roles.title FROM employees INNER JOIN roles ON employees.role_id = roles.id`, (err, res) => {
-      const employeeList = res.map((employee) => ({
-        name: `${employee.first_name} ${employee.last_name}`,
-        value: employee.role_id,
-      }))
-      console.log(employeeList)
-
-      const roleList = res.map((employee) => ({
-        name: employee.title,
-        value: employee.role_id,
-      }))
-      console.log(roleList);
-      
     inquirer.prompt ([
       {
         name: "updateEmployee",
         message: "Please select which employee you would like to update.",
         type: "list",
-        choices: employeeList,
+        choices: employees.map((employee) => ({
+          name: `${employee.first_name} ${employee.last_name}`,
+          value: employee.id,
+        })),
       },
       {
         name: "newRole",
         message: "Please select the new role for the employee.",
         type: "list",
-        choices: roleList, // Add the choices for the new role
+        choices: roles.map((employee) => ({
+          name: employee.title,
+          value: employee.id,
+        })), // Add the choices for the new role
       },
-      ])
-    })
-};
+      ]).then(async res => {
+        await db.promise().query(`UPDATE employees SET role_id = ${res.newRole} WHERE id = ${res.updateEmployee}`)
+        init();
+      })
+    }
+
 
 const inquirerPrompt = [
   {
@@ -181,6 +180,7 @@ init = () => {
             console.log(err);
           }
           console.table(result);
+          init();
         });
         break;
       case "View All Roles":
@@ -191,6 +191,7 @@ init = () => {
               console.log(err);
             }
             console.table(result);
+            init();
           }
         );
         break;
@@ -202,6 +203,7 @@ init = () => {
               console.log(err);
             }
             console.table(result);
+            init();
           }
         );
         break;
