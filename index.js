@@ -152,6 +152,32 @@ const updateEmployee = async() => {
       })
     }
 
+const employeesByManagers = async () => {
+  const [managers] = await db.promise().query('SELECT * FROM employees WHERE manager_id IS NULL');
+
+  const managerChoices = managers.map((res) => ({
+    name: `${res.first_name} ${res.last_name}`,
+    value: res.id,
+  }));
+
+  const res = await inquirer.prompt([
+    {
+      name: 'selectedManager',
+      message: 'Which manager would you like to see the employees for?',
+      type: 'list',
+      choices: managerChoices
+    }
+  ]);
+    const [managerByEmployee] = await db.promise().query(
+      `SELECT first_name, last_name FROM employees WHERE manager_id = ${res.selectedManager}`
+    );
+    
+    for (const employee of managerByEmployee) {
+      console.log(`${employee.first_name} ${employee.last_name}`);
+    }
+    init();
+  }
+
 
 const inquirerPrompt = [
   {
@@ -162,6 +188,7 @@ const inquirerPrompt = [
       "View All Departments",
       "View All Roles",
       "View All Employees",
+      "View Employees by Manager",
       "Add a Department",
       "Add a Role",
       "Add an Employee",
@@ -207,6 +234,9 @@ init = () => {
           }
         );
         break;
+      case "View Employees by Manager":
+        employeesByManagers();
+        break;
       case "Add a Department":
         addADepartment();
         break;
@@ -228,3 +258,4 @@ init = () => {
 
 
 init();
+
