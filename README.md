@@ -16,7 +16,7 @@
   This application will create a database for all the employees of an company. Using the command line, the user can view all the information or add/update the information in the database. 
 
   ## Installation<a name="installation"></a>
-  Please use npm i in the terminal to install all of the necessary dependencies.  
+  Please use npm i in the terminal to install all of the necessary dependencies. Also go into the sql folder in the command line and download the database and seed it.  
 
   ## Usage<a name="usage"></a> 
   To use this project, please import the sql database and seeds first. After that, type node index.js in the command line to begin being prompted with questions. 
