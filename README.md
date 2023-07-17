@@ -19,8 +19,8 @@
   Please use npm i in the terminal to install all of the necessary dependencies. Also go into the sql folder in the command line and download the database and seed it.  
 
   ## Usage<a name="usage"></a> 
-  To use this project, please import the sql database and seeds first. After that, type node index.js in the command line to begin being prompted with questions. 
-  [Video Walkthrough](https://drive.google.com/file/d/1eqmU_czspetV5ywkY922V9E9EqGC2Fod/view)
+  To use this project, please import the sql database and seeds first. After that, type node index.js in the command line to begin being prompted with questions. <br>
+  Click here for a [video walkthrough](https://drive.google.com/file/d/1eqmU_czspetV5ywkY922V9E9EqGC2Fod/view)
   ## Tests<a name="tests"></a>
   No testing has been implemented yet. 
 
